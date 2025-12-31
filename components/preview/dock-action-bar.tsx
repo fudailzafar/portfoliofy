@@ -81,23 +81,23 @@ export default function DockActionBar({
 
   return (
     <>
-      <div className="relative flex items-center gap-5 px-4 py-4 lg:w-[66%] lg:px-3.5 lg:py-3 lg:rounded-2xl lg:border lg:border-white/20 lg:bg-white/70 lg:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] lg:backdrop-blur-xl lg:backdrop-saturate-150">
+      <div className="relative flex items-center gap-5 px-4 py-3 xl:w-[499px] xl:rounded-2xl xl:bg-white/70 xl:shadow-[0_0_0_1px_rgba(0,0,0,.04),0_27px_54px_rgba(0,0,0,.04),0_17.5px_31.625px_rgba(0,0,0,.03),0_10.4px_17.2px_rgba(0,0,0,.024),0_5.4px_8.775px_rgba(0,0,0,.02),0_2.2px_4.4px_rgba(0,0,0,.016),0_.5px_2.125px_rgba(0,0,0,.01)] xl:backdrop-blur-xl xl:backdrop-saturate-150">
         {/* Share Button */}
         <Button
           ref={copyButtonRef}
           onClick={handleCopyLink}
           disabled={isSaving}
-          className="group relative hidden h-[33px] w-[33px] flex-shrink-0 !rounded-md bg-design-success !p-0 px-0 text-sm font-medium !shadow-[0px_2px_3px_rgba(0,0,0,0.06)] transition-all hover:bg-[#3dda69] active:scale-95 sm:inline sm:w-[127px] sm:px-0"
+          className="group relative hidden h-[33px] w-[33px] flex-shrink-0 !rounded-md bg-design-success !p-0 px-0 text-sm font-medium !shadow-[0px_2px_3px_rgba(0,0,0,0.06)] transition-all hover:bg-[#3dda69] active:scale-95 xl:inline xl:w-[127px] xl:px-0"
         >
           <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-md">
             {isSaving ? (
               <>
                 <LoaderIcon className="size-4" />
-                <span className="ml-1.5 hidden sm:inline">Saving...</span>
+                <span className="ml-1.5 hidden xl:inline">Saving...</span>
               </>
             ) : (
               <>
-                <span className="hidden font-semibold sm:inline">
+                <span className="hidden font-semibold xl:inline">
                   Copy my Link
                 </span>
               </>
@@ -107,14 +107,14 @@ export default function DockActionBar({
           </div>
           {/* Tooltip */}
           {!isSaving && (
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden min-w-max -translate-x-1/2 transform rounded-md border border-slate-100 bg-white px-2 py-1 text-[10px] font-normal leading-tight text-design-resume opacity-0 shadow-md transition-opacity delay-700 duration-200 group-hover:opacity-100 sm:block">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden min-w-max -translate-x-1/2 transform rounded-md border border-slate-100 bg-white px-2 py-1 text-[10px] font-normal leading-tight text-design-resume opacity-0 shadow-md transition-opacity delay-700 duration-200 group-hover:opacity-100 xl:block">
               Share your Portfolio
             </div>
           )}
         </Button>
 
         {/* Divider */}
-        <div className="hidden h-4 w-[2px] flex-shrink-0 rounded-lg bg-black/[0.08] sm:inline" />
+        <div className="hidden h-4 w-[2px] flex-shrink-0 rounded-lg bg-black/[0.08] xl:inline" />
 
         <div className="block">
           <SectionActionBar
@@ -128,10 +128,10 @@ export default function DockActionBar({
         </div>
 
         {/* Divider */}
-        <div className="hidden h-4 w-[2px] flex-shrink-0 rounded-lg bg-black/[0.08] sm:block" />
+        <div className="hidden h-4 w-[2px] flex-shrink-0 rounded-lg bg-black/[0.08] xl:block" />
 
         {/* Desktop/Mobile Toggle */}
-        <div className="hidden flex-shrink-0 items-center space-x-1 sm:flex">
+        <div className="hidden flex-shrink-0 items-center space-x-1 xl:flex">
           <button
             onClick={() => onViewModeChange?.('desktop')}
             className={`group relative h-[33px] w-[50px] !rounded-md transition-all active:scale-95 ${

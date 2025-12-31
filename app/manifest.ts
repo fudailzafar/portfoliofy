@@ -4,12 +4,11 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Porfoliofy',
     short_name: 'Porfoliofy',
-    description:
-      'Portfoliofy - A Portfolio, but Rich and Beautiful. LinkedIn to Portfolio in one click!',
+    description: 'Portfoliofy - A Portfolio, but Rich and Beautiful.',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#7c3aed',
+    theme_color: '#ffffff',
     icons: [
       {
         src: '/icons/android-chrome-192x192.png',

@@ -1,9 +1,9 @@
 import {
-  Avatars,
-  Cta,
-  Demo,
+  AllTheWidgets,
+  FamiliarFaces,
   Footer,
   Hero,
+  LogoMarquee,
   UniqueLink,
   VideoDialog,
 } from '@/components/home';
@@ -13,10 +13,10 @@ export default function Home() {
     <>
       <Hero />
       <VideoDialog />
-      <Avatars />
-      <Demo />
+      <FamiliarFaces />
+      <AllTheWidgets />
+      <LogoMarquee />
       <UniqueLink />
-      <Cta />
       <Footer />
     </>
   );
