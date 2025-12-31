@@ -1,5 +1,6 @@
-import { ReactQueryClientProvider } from '@/components/utils';
-import React from 'react';
+import type React from 'react';
+import { TopMenu } from '../../components/TopMenu';
+import { Footer } from '../../components/Footer';
 
 export default function RootLayout({
   children,
@@ -8,11 +9,11 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <ReactQueryClientProvider>
-        <section className="flex min-h-[calc(100vh-200px)] flex-1 flex-col">
-          {children}
-        </section>
-      </ReactQueryClientProvider>
+      <TopMenu />
+      <section className="flex-1 flex flex-col min-h-[calc(100vh-200px)]">
+        {children}
+      </section>
+      <Footer />
     </>
   );
 }

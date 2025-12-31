@@ -1,44 +1,21 @@
-import { checkUsernameAvailability } from '@/lib/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { checkUsernameAvailability } from '@/lib/server/redisActions';
+import { NextResponse } from 'next/server';
 
 // API Response Types
-export type GetResponse = { available: boolean } | { error: string };
-
-// GET endpoint to check username availability
-export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const username = searchParams.get('username');
-
-    if (!username || typeof username !== 'string') {
-      return NextResponse.json(
-        { error: 'Username parameter is required' },
-        { status: 400 }
-      );
-    }
-
-    const { available } = await checkUsernameAvailability(username);
-
-    return NextResponse.json({ available });
-  } catch (error) {
-    console.error('Error checking username availability:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+export type PostResponse = { available: boolean } | { error: string };
 
 // POST endpoint to check username availability
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: Request,
+): Promise<NextResponse<PostResponse>> {
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const { searchParams } = new URL(request.url);
     const username = searchParams.get('username');
 
     if (!username || typeof username !== 'string') {
       return NextResponse.json(
         { error: 'Username parameter is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +26,7 @@ export async function POST(request: NextRequest) {
     console.error('Error checking username availability:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

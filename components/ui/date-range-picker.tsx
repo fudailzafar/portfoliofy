@@ -1,14 +1,11 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Label } from './label';
 import { cn } from '@/lib/utils';
 import { MonthPicker } from './monthpicker';
 import { Button } from './button';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { CrossIcon } from '../icons';
 
 interface DateRangePickerProps {
   startDate: string | null | undefined;
@@ -29,14 +26,8 @@ export function DateRangePicker({
   const [endOpen, setEndOpen] = useState(false);
 
   // Convert string dates to Date objects for MonthPicker
-  const startDateObj =
-    startDate && !isNaN(new Date(startDate).getTime())
-      ? new Date(startDate)
-      : undefined;
-  const endDateObj =
-    endDate && !isNaN(new Date(endDate).getTime())
-      ? new Date(endDate)
-      : undefined;
+  const startDateObj = startDate ? new Date(startDate) : undefined;
+  const endDateObj = endDate ? new Date(endDate) : undefined;
 
   // Handle month selection
   const handleStartMonthSelect = (date: Date) => {
@@ -55,9 +46,9 @@ export function DateRangePicker({
 
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-0">
         <div className="flex-1 sm:mr-2">
-          <Label className="mb-2 block text-sm font-medium text-slate-400">
+          <Label className="text-sm font-medium text-slate-400 mb-2 block">
             Start Date
           </Label>
           <Popover open={startOpen} onOpenChange={setStartOpen}>
@@ -66,13 +57,13 @@ export function DateRangePicker({
                 variant="outline"
                 className={cn(
                   'w-full justify-start text-left font-normal',
-                  !startDateObj && 'text-muted-foreground'
+                  !startDateObj && 'text-muted-foreground',
                 )}
               >
-                <div className="flex w-full items-center">
+                <div className="flex items-center w-full">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span className="flex-1">
-                    {startDateObj && !isNaN(startDateObj.getTime())
+                    {startDateObj
                       ? format(startDateObj, 'MMM yyyy')
                       : 'Pick a start month'}
                   </span>
@@ -96,7 +87,7 @@ export function DateRangePicker({
           </Popover>
         </div>
         <div className="flex-1 sm:ml-2">
-          <Label className="mb-2 block text-sm font-medium text-slate-400">
+          <Label className="text-sm font-medium text-slate-400 mb-2 block">
             End Date
           </Label>
           <Popover open={endOpen} onOpenChange={setEndOpen}>
@@ -105,26 +96,26 @@ export function DateRangePicker({
                 variant="outline"
                 className={cn(
                   'w-full justify-start text-left font-normal',
-                  !endDateObj && 'text-muted-foreground'
+                  !endDateObj && 'text-muted-foreground',
                 )}
               >
-                <div className="flex w-full items-center">
+                <div className="flex items-center w-full">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   <span className="flex-1">
-                    {endDateObj && !isNaN(endDateObj.getTime())
+                    {endDateObj
                       ? format(endDateObj, 'MMM yyyy')
                       : 'Pick an end month'}
                   </span>
                   {endDateObj && (
                     <div
                       role="button"
-                      className="flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm p-0 hover:bg-accent"
+                      className="h-4 w-4 p-0 flex items-center justify-center hover:bg-accent rounded-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEndDateChange('');
                       }}
                     >
-                      <CrossIcon className="h-3 w-3" />
+                      <X className="h-3 w-3" />
                     </div>
                   )}
                 </div>

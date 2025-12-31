@@ -1,107 +1,46 @@
-<a href="https://portfoliofy.me">
-  <img alt="Open Graph Image" src="./app/opengraph-image.png">
+<a href="https://www.portfoliofy.me">
+  <img alt="Self" src="./public/og.png">
   <h1 align="center">Portfoliofy</h1>
 </a>
 
 <p align="center">
-  An AI-powered personal site builder. Powered by Gemini.
+  An open source personal site builder. Powered by Gemini and AWS.
 </p>
 
-## Features
+## Tech stack
 
-- **AI-Generated Portfolios** – Create a complete professional portfolio in minutes using natural-language prompts.
-- **Real-Time UI Updates** – Every change instantly reflects in the live preview with no rebuilds or reloads.
-- **Multi-Section Customization** – Add, remove, reorder, and edit sections like Projects, Skills, Experience, and Education.
-- **Smart Content Import** – Pull and structure data from your resume or LinkedIn export to auto-populate your portfolio.
+- Together.ai for the LLM
+- Vercel's AI SDK as the LLM framework
+- Clerk for authentication
+- Next.js app router
+- Helicone for observability
+- S3 for object storage (PDFs)
+- Upstash redis for my DB
+- Vercel for hosting
 
-## Tech Stack
+## How it works
 
-- **Frontend:** Next.js, React, Tailwind CSS, ShadcnUI
-- **Backend:** Next.js API Routes, Tambo API
-- **Hosting:** Vercel
-- **Authentication:** NextAuth.js / OAuth support
-- **Database:** Redis
-- **File Upload:** UploadThing / Cloudinary
+1. Create an account on the site with Clerk
+2. Upload a PDF which gets uploaded to S3
+3. Send the PDF as context to Gemini 2.5 Flash to extract out relevant information with structured outputs (JSON mode)
+4. Get all the information & put it on a dynamic route for the user to be able to view & publish their site
 
-## Getting Started
+## Cloning & running
 
-### Prerequisites
+1. Fork or clone the repo
+2. Create an account at [Gemini](https://gemini.google.com) for the LLM
+3. Create an account at [Upstash](https://upstash.com/) for the Redis DB
+4. Create an account at [AWS](https://aws.amazon.com/) for the S3 bucket
+5. Create a `.env` (use the `.example.env` for reference) and replace the API keys
+6. Run `pnpm install` and `pnpm run dev` to install dependencies and run locally
 
-- Node.js (v18+)
-- Vercel CLI (for deployment)
+## Future tasks
 
-### Installation
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/fudailzafar/portfoliofy.git
-   cd caleasy
-   ```
-
-2. Install dependencies:
-
-   ```sh
-   npm install
-   ```
-
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-
-   ```env
-   AUTH_GOOGLE_ID=""
-   AUTH_GOOGLE_SECRET=""
-   AUTH_SECRET=""
-   CLERK_SECRET_KEY=""
-   GOOGLE_ANALYTICS_MEASUREMENT_ID=""
-   NEXTAUTH_URL=""
-   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=""
-   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=""
-   NEXT_PUBLIC_POSTHOG_HOST=""
-   NEXT_PUBLIC_POSTHOG_KEY=""
-   NEXT_PUBLIC_TAMBO_API_KEY=""
-   UPLOADTHING_SECRET=""
-   UPLOADTHING_TOKEN=""
-   UPSTASH_REDIS_REST_TOKEN=""
-   UPSTASH_REDIS_REST_URL=""
-   RESEND_API_KEY=""
-   ```
-
-4. Run database migrations:
-
-   ```sh
-   npx prisma migrate dev
-   ```
-
-5. Start the development server:
-
-   ```sh
-   npm run dev
-   ```
-
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Deployment
-
-### Deploy to Vercel
-
-1. Install Vercel CLI:
-   ```sh
-   npm install -g vercel
-   ```
-2. Link the project:
-   ```sh
-   vercel
-   ```
-3. Deploy:
-   ```sh
-   vercel --prod
-   ```
-
-## Contributing
-
-Pull requests are welcome! Please open an issue first to discuss any changes.
-
-## License
-
-MIT License. See `LICENSE` for details.
+- [ ] Change llama 3.3 to Qwen 2.5 on the app
+- [ ] Add Helicone for observability
+- [ ] add error logging to make sure to fix any bugs
+- [ ] add ability to get to the "preview" page if you have a site already
+- [ ] ability to edit links in the site
+- [ ] ability to edit any section in the site
+- [ ] add themes that you can toggle on (start with ghibli)
+- [ ] Delete previously uploaded resume when we upload a new one

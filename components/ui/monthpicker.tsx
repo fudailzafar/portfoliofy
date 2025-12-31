@@ -75,9 +75,9 @@ function MonthPicker({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & MonthCalProps) {
   return (
-    <div className={cn('w-[280px] min-w-[200px] p-3', className)} {...props}>
-      <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-        <div className="w-full space-y-4">
+    <div className={cn('min-w-[200px] w-[280px] p-3', className)} {...props}>
+      <div className="flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0">
+        <div className="space-y-4 w-full">
           <MonthCal
             onMonthSelect={onMonthSelect}
             callbacks={callbacks}
@@ -107,10 +107,10 @@ function MonthCal({
   onYearForward,
 }: MonthCalProps) {
   const [year, setYear] = React.useState<number>(
-    selectedMonth?.getFullYear() ?? new Date().getFullYear()
+    selectedMonth?.getFullYear() ?? new Date().getFullYear(),
   );
   const [month, setMonth] = React.useState<number>(
-    selectedMonth?.getMonth() ?? new Date().getMonth()
+    selectedMonth?.getMonth() ?? new Date().getMonth(),
   );
   const [menuYear, setMenuYear] = React.useState<number>(year);
 
@@ -122,11 +122,11 @@ function MonthCal({
 
   return (
     <>
-      <div className="relative flex items-center justify-center pt-1">
+      <div className="flex justify-center pt-1 relative items-center">
         <div className="text-sm font-medium">
           {callbacks?.yearLabel ? callbacks?.yearLabel(menuYear) : menuYear}
         </div>
-        <div className="flex items-center space-x-1">
+        <div className="space-x-1 flex items-center">
           <button
             onClick={() => {
               setMenuYear(menuYear - 1);
@@ -134,10 +134,10 @@ function MonthCal({
             }}
             className={cn(
               buttonVariants({ variant: variant?.chevrons ?? 'outline' }),
-              'absolute left-1 inline-flex h-7 w-7 items-center justify-center p-0'
+              'inline-flex items-center justify-center h-7 w-7 p-0 absolute left-1',
             )}
           >
-            <ChevronLeft className="h-4 w-4 opacity-50" />
+            <ChevronLeft className="opacity-50 h-4 w-4" />
           </button>
           <button
             onClick={() => {
@@ -146,10 +146,10 @@ function MonthCal({
             }}
             className={cn(
               buttonVariants({ variant: variant?.chevrons ?? 'outline' }),
-              'absolute right-1 inline-flex h-7 w-7 items-center justify-center p-0'
+              'inline-flex items-center justify-center h-7 w-7 p-0 absolute right-1',
             )}
           >
-            <ChevronRight className="h-4 w-4 opacity-50" />
+            <ChevronRight className="opacity-50 h-4 w-4" />
           </button>
         </div>
       </div>
@@ -157,12 +157,12 @@ function MonthCal({
         <tbody>
           {MONTHS.map((monthRow, a) => {
             return (
-              <tr key={'row-' + a} className="mt-2 flex w-full">
+              <tr key={'row-' + a} className="flex w-full mt-2">
                 {monthRow.map((m) => {
                   return (
                     <td
                       key={m.number}
-                      className="relative h-10 w-1/4 p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md"
+                      className="h-10 w-1/4 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
                     >
                       <button
                         onClick={() => {
@@ -184,7 +184,8 @@ function MonthCal({
                             : false) ||
                           (disabledDatesMapped
                             ? disabledDatesMapped?.some(
-                                (d) => d.year == menuYear && d.month == m.number
+                                (d) =>
+                                  d.year == menuYear && d.month == m.number,
                               )
                             : false)
                         }
@@ -195,7 +196,7 @@ function MonthCal({
                                 ? (variant?.calendar?.selected ?? 'default')
                                 : (variant?.calendar?.main ?? 'ghost'),
                           }),
-                          'h-full w-full p-0 font-normal aria-selected:opacity-100'
+                          'h-full w-full p-0 font-normal aria-selected:opacity-100',
                         )}
                       >
                         {callbacks?.monthLabel

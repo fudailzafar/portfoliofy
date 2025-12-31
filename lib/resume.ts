@@ -27,38 +27,24 @@ const SummarySection = z.string().describe('Summary of your profile');
 const WorkExperienceSection = z.array(
   z.object({
     company: z.string().describe('Company name'),
-    link: z.string().optional().default('').describe('Company website URL'),
+    link: z.string().describe('Company website URL'),
     location: z
       .string()
-      .optional()
-      .default('')
       .describe(
-        "Location with format 'City, Country' or could be Hybrid or Remote"
+        "Location with format 'City, Country' or could be Hybrid or Remote",
       ),
     contract: z
       .string()
-      .optional()
-      .default('')
       .describe('Type of work contract like Full-time, Part-time, Contract'),
-    title: z.string().optional().default('').describe('Job title'),
-    start: z
-      .string()
-      .optional()
-      .default('')
-      .describe("Start date in format 'YYYY-MM-DD'"),
+    title: z.string().describe('Job title'),
+    start: z.string().describe("Start date in format 'YYYY-MM-DD'"),
     end: z
       .string()
       .optional()
       .nullable()
-      .default('')
       .describe("End date in format 'YYYY-MM-DD'"),
-    description: z.string().optional().default('').describe('Job description'),
-    logo: z
-      .string()
-      .optional()
-      .nullable()
-      .describe('Cloudinary URL for company logo'),
-  })
+    description: z.string().describe('Job description'),
+  }),
 );
 
 const EducationSection = z.array(
@@ -67,117 +53,14 @@ const EducationSection = z.array(
     degree: z.string().describe('Degree or certification obtained'),
     start: z.string().describe('Start year'),
     end: z.string().describe('End year'),
-    logo: z
-      .string()
-      .optional()
-      .nullable()
-      .describe('Cloudinary URL for school logo'),
-  })
-);
-
-const ContactSection = z.string().describe('Catchy Phrase for call to action');
-
-const ProjectSection = z.array(
-  z.object({
-    title: z.string().optional().default('').describe('Project Title'),
-    description: z
-      .string()
-      .optional()
-      .default('')
-      .describe('Project description'),
-    liveLink: z.string().optional().default('').describe('Project website URL'),
-    githubLink: z
-      .string()
-      .optional()
-      .default('')
-      .describe('Project website URL'),
-    start: z
-      .string()
-      .optional()
-      .default('')
-      .describe("Start date in format 'YYYY-MM-DD'"),
-    end: z
-      .string()
-      .optional()
-      .nullable()
-      .default('')
-      .describe("End date in format 'YYYY-MM-DD'"),
-    skills: z
-      .array(z.string())
-      .describe('Skills used for building projects the user has made.')
-      .optional(),
-    image: z
-      .string()
-      .optional()
-      .nullable()
-      .describe('Cloudinary URL for project image'),
-  })
+  }),
 );
 
 export const ResumeDataSchema = z.object({
   header: HeaderSection,
   summary: SummarySection,
   workExperience: WorkExperienceSection,
-  education: EducationSection.optional(),
-  contact: ContactSection,
-  projects: ProjectSection,
-  sectionOrder: z
-    .array(z.string())
-    .optional()
-    .default([
-      'summary',
-      'workExperience',
-      'education',
-      'skills',
-      'projects',
-      'contact',
-    ])
-    .describe('Order of sections in the resume'),
-  sectionTitles: z
-    .record(z.string())
-    .optional()
-    .default({})
-    .describe('Dynamic section titles with their IDs as keys'),
-  educations: z
-    .record(
-      z.string(),
-      z.object({
-        school: z.string().describe('School or university name'),
-        degree: z.string().describe('Degree or certification obtained'),
-        start: z.string().describe('Start year'),
-        end: z.string().describe('End year'),
-        logo: z
-          .string()
-          .optional()
-          .nullable()
-          .describe('Cloudinary URL for school logo'),
-      })
-    )
-    .optional()
-    .default({})
-    .describe('Individual education entries with their IDs as keys'),
-  works: z
-    .record(
-      z.string(),
-      z.object({
-        location: z.string().describe('Location of the job'),
-        company: z.string().describe('Company name'),
-        link: z.string().optional().describe('Company website link'),
-        contract: z.string().optional().describe('Contract type'),
-        title: z.string().describe('Job title'),
-        start: z.string().describe('Start date'),
-        end: z.string().nullable().optional().describe('End date'),
-        description: z.string().describe('Job description'),
-        logo: z
-          .string()
-          .optional()
-          .nullable()
-          .describe('Cloudinary URL for company logo'),
-      })
-    )
-    .optional()
-    .default({})
-    .describe('Individual work experience entries with their IDs as keys'),
+  education: EducationSection,
 });
 
 export type ResumeDataSchemaType = z.infer<typeof ResumeDataSchema>;

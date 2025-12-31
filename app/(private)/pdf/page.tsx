@@ -1,21 +1,12 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import {
-  getResume,
-  storeResume,
-  scrapePdfContent,
-  deleteUploadThingFile,
-  getUsernameById,
-} from '@/lib/server';
+import { auth } from '@clerk/nextjs/server';
+import { getResume, storeResume } from '../../../lib/server/redisActions';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
-import { LoadingFallback } from '@/components/utils';
+import LoadingFallback from '../../../components/LoadingFallback';
+import { scrapePdfContent } from '@/lib/server/scrapePdfContent';
+import { deleteS3File } from '@/lib/server/deleteS3File';
 
-interface PdfProcessingProps {
-  userId: string;
-}
-
-async function PdfProcessing({ userId }: PdfProcessingProps) {
+async function PdfProcessing({ userId }: { userId: string }) {
   const resume = await getResume(userId);
 
   if (!resume || !resume.file || !resume.file.url) redirect('/upload');
@@ -27,8 +18,10 @@ async function PdfProcessing({ userId }: PdfProcessingProps) {
     const isContentBad = false; // await isFileContentBad(fileContent);
 
     if (isContentBad) {
-      // Delete file from UploadThing
-      await deleteUploadThingFile(resume.file.url);
+      await deleteS3File({
+        bucket: resume.file.bucket,
+        key: resume.file.key,
+      });
 
       await storeResume(userId, {
         ...resume,
@@ -47,24 +40,22 @@ async function PdfProcessing({ userId }: PdfProcessingProps) {
     });
   }
 
-  const username = await getUsernameById(userId);
-  redirect(username ? `/${username}` : '/upload');
+  redirect('/preview');
   return <></>; // This line will never be reached due to the redirect
 }
 
 export default async function Pdf() {
-  const session = await getServerSession(authOptions);
+  const { userId, redirectToSignIn } = await auth();
 
-  if (!session?.user?.email) {
-    redirect('/login');
-  }
-
-  // Use email as userId or create a consistent user identifier
-  const userId = session.user.email;
+  if (!userId) return redirectToSignIn();
 
   return (
     <>
-      <Suspense fallback={<LoadingFallback />}>
+      <Suspense
+        fallback={
+          <LoadingFallback message="Reading your resume carefully..." />
+        }
+      >
         <PdfProcessing userId={userId} />
       </Suspense>
     </>

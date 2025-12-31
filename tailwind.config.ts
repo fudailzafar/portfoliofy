@@ -3,10 +3,6 @@ import type { Config } from 'tailwindcss';
 const config: Config = {
   darkMode: ['class'],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -14,24 +10,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['var(--font-sans)', '...fontFamily.sans'],
-      },
       colors: {
         design: {
           black: '#1f1f1f',
           white: '#ffffff',
-          gray: '#6c6c6c',
+          gray: '#5d5d5d',
           resume: '#6B7280',
-          primary: '#778CFF',
-          primaryLight: '#768CFF',
-          primaryDark: '#6a7ff1',
-          secondary: '#ed3a51',
-          secondaryLight: '#f1697a',
-          secondaryDark: '#e0142f',
-          success: '#4edd76',
-          warning: '#eded3a',
-          error: '#ed3a3a',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -106,32 +90,13 @@ const config: Config = {
             height: '0',
           },
         },
-        marquee: {
-          from: {
-            transform: 'translateX(0)',
-          },
-          to: {
-            transform: 'translateX(calc(-100% - var(--gap)))',
-          },
-        },
-        'marquee-vertical': {
-          from: {
-            transform: 'translateY(0)',
-          },
-          to: {
-            transform: 'translateY(calc(-100% - var(--gap)))',
-          },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        marquee: 'marquee var(--duration) linear infinite',
-        'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
       },
     },
   },
   plugins: [require('tailwindcss-animate')],
 };
-
 export default config;

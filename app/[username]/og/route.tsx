@@ -1,148 +1,155 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { getUserData } from '../utils';
-
-async function loadGoogleFont(font: string, text: string, weight: number) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(
-    text
-  )}`;
-  const css = await (await fetch(url)).text();
-  const resource = css.match(
-    /src: url\((.+)\) format\('(opentype|truetype)'\)/
-  );
-
-  if (resource) {
-    const response = await fetch(resource[1]);
-    if (response.status == 200) {
-      return await response.arrayBuffer();
-    }
-  }
-
-  throw new Error('failed to load font data');
-}
 
 export async function GET(request: NextRequest) {
   try {
     const username = request.nextUrl.pathname.split('/')[1];
-    const { resume, userData } = await getUserData(username);
+
+    const { user_id, resume, clerkUser } = await getUserData(username);
+
+    const { searchParams } = new URL(request.url);
+
+    // Get data from resume
     const name = resume?.resumeData?.header?.name;
     const role = resume?.resumeData?.header?.shortAbout;
-    const profileImageUrl = userData?.image;
+    const location = resume?.resumeData?.header?.location;
+    const website = `www.portfoliofy.me/${username}`;
 
-    // Load Inter font for the text that will be displayed
-    const nameText = name || '';
-    const roleText = role || '';
-
-    const interBoldData = await loadGoogleFont('Inter', nameText, 700);
-    const interSemiBoldData = await loadGoogleFont('Inter', roleText, 400);
+    // Use profile image from Clerk user
+    const profileImageUrl = clerkUser?.imageUrl;
 
     return new ImageResponse(
-      (
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'white',
+          padding: '80px',
+          position: 'relative',
+        }}
+      >
+        {/* Logo and Location */}
         <div
           style={{
-            height: '100%',
-            width: '100%',
             display: 'flex',
-            flexDirection: 'column',
+            width: '100%',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'white',
-            padding: '80px',
-            position: 'relative',
-            fontFamily: 'Inter',
+            position: 'absolute',
+            top: 60,
+            left: 80,
+            right: 0,
+            paddingRight: 40,
           }}
         >
-          {/* Main Content */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img
+              src="https://portfoliofy.me/logo.png"
+              alt="Portfoliofy Logo"
+              style={{
+                width: '144px',
+                height: '46px',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: '24px',
+              color: '#666',
+              textAlign: 'right',
+            }}
+          >
+            {location}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div
+          style={{
+            display: 'flex',
+            width: '100%',
+            marginTop: '40px',
+            height: '480px',
+          }}
+        >
+          {/* Left side - Text content */}
           <div
             style={{
               display: 'flex',
-              width: '100%',
-              marginTop: '40px',
-              height: '480px',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              width: '60%',
+              paddingRight: '40px',
             }}
           >
-            {/* Left side - Text content */}
-            <div
+            <h1
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                width: '60%',
-                paddingRight: '40px',
+                fontSize: '72px',
+                fontWeight: 'semibold',
+                margin: '0 0 20px 0',
+                color: '#222',
+                lineHeight: 1.1,
               }}
             >
-              <h1
-                style={{
-                  fontSize: '80px',
-                  fontWeight: 700,
-                  margin: '0 0 20px 0',
-                  color: '#222',
-                  lineHeight: 1.1,
-                  fontFamily: 'Inter',
-                }}
-              >
-                {name}
-              </h1>
-              <p
-                style={{
-                  fontSize: '32px',
-                  fontWeight: 400,
-                  margin: 0,
-                  color: '#444',
-                  lineHeight: 1.4,
-                  fontFamily: 'Inter',
-                }}
-              >
-                {role && role?.length > 90
-                  ? `${role?.substring(0, 90)}...`
-                  : role}
-              </p>
-            </div>
+              {name}
+            </h1>
+            <p
+              style={{
+                fontSize: '32px',
+                color: '#444',
+                margin: 0,
+                lineHeight: 1.4,
+              }}
+            >
+              {role && role?.length > 90
+                ? `${role?.substring(0, 90)}...`
+                : role}
+            </p>
+          </div>
 
-            {/* Right side - Profile image */}
-            <div
+          {/* Right side - Profile image */}
+          <div
+            style={{
+              width: '40%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <img
+              src={profileImageUrl || `${request.nextUrl.origin}/placeholder.svg`}
+              alt="Profile"
               style={{
-                width: '40%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                width: '360px',
+                height: '360px',
+                borderRadius: '16px',
+                objectFit: 'cover',
               }}
-            >
-              <img
-                src={
-                  profileImageUrl ||
-                  'https://portfoliofy.me/user/placeholder.svg'
-                }
-                alt="Profile"
-                style={{
-                  width: '360px',
-                  height: '360px',
-                  borderRadius: '16px',
-                  objectFit: 'cover',
-                }}
-              />
-            </div>
+            />
           </div>
         </div>
-      ),
+
+        {/* Website URL at bottom */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 20,
+            fontSize: '24px',
+            color: '#666',
+          }}
+        >
+          {website}
+        </div>
+      </div>,
       {
         width: 1200,
         height: 630,
-        fonts: [
-          {
-            name: 'Inter',
-            data: interBoldData,
-            style: 'normal',
-            weight: 700,
-          },
-          {
-            name: 'Inter',
-            data: interSemiBoldData,
-            style: 'normal',
-            weight: 400,
-          },
-        ],
-      }
+      },
     );
   } catch (e: any) {
     console.log(`${e.message}`);

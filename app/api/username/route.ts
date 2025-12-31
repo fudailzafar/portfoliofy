@@ -1,6 +1,5 @@
-import { getUsernameById, updateUsername } from '@/lib/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getUsernameById, updateUsername } from '@/lib/server/redisActions';
+import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 // API Response Types
@@ -10,29 +9,29 @@ export type PostResponse = { success: true } | { error: string };
 // GET endpoint to retrieve username
 export async function GET(): Promise<NextResponse<GetResponse>> {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const user = await currentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const username = await getUsernameById(session.user.email);
+    const username = await getUsernameById(user.id);
     return NextResponse.json({ username });
   } catch (error) {
     console.error('Error retrieving username:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 // POST endpoint to update username
 export async function POST(
-  request: Request
+  request: Request,
 ): Promise<NextResponse<PostResponse>> {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    const user = await currentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -41,16 +40,16 @@ export async function POST(
     if (!username || typeof username !== 'string') {
       return NextResponse.json(
         { error: 'Username is required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const success = await updateUsername(session.user.email, username);
+    const success = await updateUsername(user.id, username);
 
     if (!success) {
       return NextResponse.json(
         { error: 'Username already taken' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -59,7 +58,7 @@ export async function POST(
     console.error('Error updating username:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

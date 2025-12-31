@@ -1,20 +1,26 @@
 'use client';
 
-import { FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dropzone } from '@/components/ui/dropzone';
+import { Linkedin, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useUserActions } from '@/hooks';
-import { UploadButton } from '@/lib';
-import { CircleArrowUpIcon, CrossIcon, LoaderIcon } from '@/components/icons';
+import { toast } from 'sonner';
 import {
-  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useUserActions } from '@/hooks/useUserActions';
+import { useEffect, useState } from 'react';
+import { CustomSpinner } from '@/components/CustomSpinner';
+import LoadingFallback from '@/components/LoadingFallback';
+import {
   Dialog,
+  DialogTrigger,
   DialogContent,
   DialogTitle,
-  DialogTrigger,
-} from '@/components/ui';
-import { LoadingFallback } from '@/components/utils';
-import { LogInAnimation } from '@/components/auth';
+} from '@/components/ui/dialog';
 
 type FileState =
   | { status: 'empty' }
@@ -42,16 +48,8 @@ export default function UploadPageClient() {
     }
   }, [resume]);
 
-  // Handles UploadThing result
-  const handleUploadThing = (res: any[]) => {
-    if (res && res[0]) {
-      // res[0].name, res[0].url, res[0].size
-      uploadResumeMutation.mutate({
-        name: res[0].name,
-        url: res[0].url ?? res[0].fileUrl ?? '',
-        size: res[0].size ?? 0,
-      });
-    }
+  const handleUploadFile = async (file: File) => {
+    uploadResumeMutation.mutate(file);
   };
 
   const handleReset = () => {
@@ -59,155 +57,120 @@ export default function UploadPageClient() {
   };
 
   if (resumeQuery.isLoading) {
-    return <LoadingFallback />;
+    return <LoadingFallback message="Loading..." />;
   }
 
   const isUpdating = resumeQuery.isPending || uploadResumeMutation.isPending;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8 sm:justify-between sm:px-6 md:gap-12 lg:gap-16 lg:px-32">
-      <div className="w-full max-w-[440px] space-y-6 sm:space-y-8">
-        <div className="text-left">
-          <h1 className="text-xl font-semibold text-design-black sm:text-2xl md:mb-4 lg:text-2xl">
-            Now, let's upload your resume for your portfolio.
-          </h1>
-        </div>
+    <div className="flex flex-col items-center flex-1 px-4 py-12 gap-6">
+      <div className="w-full max-w-[438px] text-center font-mono">
+        <h1 className="text-base text-center pb-6">
+          Upload a PDF of your LinkedIn or your resume and generate your
+          personal site
+        </h1>
 
-        <div className="relative">
-          <div className="relative flex min-h-[180px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white transition-all sm:min-h-[220px]">
-            {fileState.status === 'empty' && !isUpdating && (
-              <UploadButton
-                endpoint="resumeUploader"
-                onClientUploadComplete={handleUploadThing}
-                appearance={{
-                  button:
-                    'w-full h-full min-h-[180px] sm:min-h-[220px] flex flex-col items-center justify-center bg-transparent border-none shadow-none cursor-pointer',
-                  container: 'w-full',
-                }}
-                content={{
-                  button() {
-                    return (
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <CircleArrowUpIcon className="h-6 w-6 text-gray-600" />
-                        <span className="text-center text-base font-bold text-black">
-                          Upload PDF
-                        </span>
-                        <span className="text-center text-xs font-light text-gray-500">
-                          Resume or LinkedIn
-                        </span>
-                      </div>
-                    );
-                  },
-                }}
-              />
-            )}
-            {isUpdating && (
-              <div className="flex h-full min-h-[180px] w-full flex-col items-center justify-center sm:min-h-[220px]">
-                <LoaderIcon className="mb-2 h-6 w-6 sm:h-8 sm:w-8" />
-                <span className="text-xs text-gray-500 sm:text-sm">
-                  Uploading...
-                </span>
-              </div>
-            )}
-            {fileState.status === 'saved' && !isUpdating && (
-              <>
-                <button
-                  onClick={handleReset}
-                  className="absolute right-2 top-2 z-10 rounded-full p-1 hover:bg-gray-100"
-                  disabled={isUpdating}
-                >
-                  <CrossIcon className="h-4 w-4 text-gray-500" />
-                </button>
-                <div className="flex h-full min-h-[180px] w-full flex-col items-center justify-center gap-2 sm:min-h-[220px]">
-                  <FileText className="mx-auto size-10 sm:size-12" />
-                  <span className="text-center text-sm font-bold text-black sm:text-base">
-                    {fileState.file.name}
-                  </span>
-                  <span className="text-center text-xs font-light text-gray-500">
-                    {(fileState.file.size / 1024 / 1024).toFixed(2)} MB
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+        <div className="relative mx-2.5">
+          {fileState.status !== 'empty' && (
+            <button
+              onClick={handleReset}
+              className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded-full z-10"
+              disabled={isUpdating}
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+          )}
+
+          <Dropzone
+            accept={{ 'application/pdf': ['.pdf'] }}
+            maxFiles={1}
+            icon={
+              fileState.status !== 'empty' ? (
+                <img src="/uploaded-pdf.svg" className="h-6 w-6" />
+              ) : (
+                <Linkedin className="h-6 w-6 text-gray-600" />
+              )
+            }
+            title={
+              <span className="text-base font-bold text-center text-design-black">
+                {fileState.status !== 'empty'
+                  ? fileState.file.name
+                  : 'Upload PDF'}
+              </span>
+            }
+            description={
+              <span className="text-xs font-light text-center text-design-gray">
+                {fileState.status !== 'empty'
+                  ? `${(fileState.file.size / 1024 / 1024).toFixed(2)} MB`
+                  : 'Resume or LinkedIn'}
+              </span>
+            }
+            isUploading={uploadResumeMutation.isPending}
+            onDrop={(acceptedFiles) => {
+              if (acceptedFiles[0]) handleUploadFile(acceptedFiles[0]);
+            }}
+            onDropRejected={() => toast.error('Only PDF files are supported')}
+          />
         </div>
 
         <Dialog>
           <DialogTrigger asChild>
             <Button
               variant="ghost"
-              className="mx-auto mt-3 flex cursor-help flex-row justify-center gap-1.5 border border-transparent text-center hover:border-gray-200 hover:bg-white"
+              className="mt-3 hover:bg-white border border-transparent hover:border-gray-200 font-mono text-center cursor-help flex flex-row gap-1.5 justify-center mx-auto"
             >
-              <span className="ml-1 inline-block h-4 w-4 cursor-help items-center justify-center rounded-full border border-gray-300 text-xs">
+              <span className="ml-1 inline-block w-4 h-4 rounded-full border border-gray-300 items-center justify-center text-xs cursor-help">
                 i
               </span>
-              <p className="whitespace-normal text-center text-xs text-design-gray">
+              <p className="text-xs text-center text-design-gray whitespace-normal">
                 How to upload LinkedIn profile
               </p>
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-full max-w-[652px] gap-0 !p-0 text-center">
-            <DialogTitle className="px-7 py-4 text-center text-base text-design-gray">
+          <DialogContent className="w-full max-w-[652px] text-center font-mono !p-0 gap-0">
+            <DialogTitle className="font-mono text-base text-center text-design-gray px-7 py-4">
               Go to your profile → Click on “Resources” → Then “Save to PDF”
             </DialogTitle>
-            <img
-              src="/user/linkedin-save-to-pdf.png"
-              alt="Linkedin Steps to Save PDF"
-              className="h-auto w-full"
-            />
+            <img src="/linkedin-save-to-pdf.png" className="h-auto w-full" />
           </DialogContent>
         </Dialog>
-
-        <div className="flex w-full flex-row items-center gap-3">
+      </div>
+      <div className="font-mono">
+        <div className="relative">
           <Button
-            className="flex-1 cursor-pointer rounded-md bg-design-primary py-6 text-sm font-semibold tracking-tight text-white shadow-lg transition-all duration-300 ease-out hover:bg-design-primaryDark active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 md:rounded-lg md:py-3"
-            disabled={isUpdating}
-            onClick={async () => {
-              if (fileState.status === 'saved') {
-                router.push('/pdf');
-              } else {
-                const usernameRes = await fetch('/api/username');
-                const usernameData = await usernameRes.json();
-                router.push(
-                  usernameData.username
-                    ? `/${usernameData.username}`
-                    : '/upload'
-                );
-              }
-            }}
+            className="px-4 py-3 h-auto bg-design-black hover:bg-design-black/95"
+            disabled={fileState.status === 'empty' || isUpdating}
+            onClick={() => router.push('/pdf')}
           >
             {isUpdating ? (
               <>
-                <LoaderIcon />
+                <CustomSpinner className="h-5 w-5 mr-2" />
+                Processing...
               </>
-            ) : fileState.status === 'saved' ? (
-              <>Generate Portfolio</>
             ) : (
-              <>Continue</>
+              <>
+                <img
+                  src="/sparkle.png"
+                  alt="Sparkle Icon"
+                  className="h-5 w-5 mr-2"
+                />
+                Generate Website
+              </>
             )}
           </Button>
-          {fileState.status === 'empty' && !isUpdating && (
-            <Button
-              onClick={async () => {
-                const usernameRes = await fetch('/api/username');
-                const usernameData = await usernameRes.json();
-                router.push(
-                  usernameData.username
-                    ? `/${usernameData.username}`
-                    : '/upload'
-                );
-              }}
-              className="flex-1 rounded-md py-6 text-sm text-gray-600 transition-colors hover:text-gray-900 md:py-3"
-              variant={'ghost'}
-            >
-              Skip
-            </Button>
+          {fileState.status === 'empty' && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="absolute inset-0" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Upload a PDF to continue</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
-      </div>
-
-      <div className="hidden max-w-[700px] flex-1 items-center justify-center md:flex">
-        <LogInAnimation />
       </div>
     </div>
   );

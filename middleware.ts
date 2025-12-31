@@ -1,32 +1,22 @@
-import { PRIVATE_ROUTES } from './lib';
-import { NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import type { NextRequest } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { PRIVATE_ROUTES } from './lib/routes';
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+const isPrivateRoute = createRouteMatcher(
+  PRIVATE_ROUTES.map((route) => `/${route}`),
+);
 
-  // Allow access to auth-related APIs without authentication
-  if (
-    pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/api/check-username')
-  ) {
-    return NextResponse.next();
+export default clerkMiddleware(async (auth, req) => {
+  // Protect all private routes - require authentication
+  if (isPrivateRoute(req)) {
+    await auth.protect();
   }
-
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-
-  // If accessing a protected route without token → redirect to login
-  if (PRIVATE_ROUTES.some((route) => pathname.startsWith(`/${route}`))) {
-    if (!token) {
-      const loginUrl = new URL('/login', req.url);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ['/preview/:path*', '/pdf/:path*', '/upload/:path*', '/api/:path*'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
